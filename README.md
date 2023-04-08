@@ -1,4 +1,4 @@
-# Full Stack Open 2023 - Modern Web Development by University of Helsinki
+# Full Stack Open 2023 - Deep Dive Into Modern Web Development by University of Helsinki
 
 This repository contains my assignment submissions for [Full Stack Open](https://fullstackopen.com/en/) a course offered by University of Helsinki.
 
