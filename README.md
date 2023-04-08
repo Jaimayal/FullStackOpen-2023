@@ -1,6 +1,6 @@
 # Full Stack Open 2023 - Modern Web Development by University of Helsinki
 
-This repository contains my assignment submissions for [University of Helsinki's Course: Full Stack Open 2023]([https://fullstackopen.com/en/](https://fullstackopen.com/en/)).
+This repository contains my assignment submissions for [University of Helsinki&#39;s Course: Full Stack Open 2023]([https://fullstackopen.com/en/](https://fullstackopen.com/en/)).
 
 This course focuses on building modern web applications with JavaScript, the main technology that this course aims to teach is React (mainly consuming REST APIs built with Node.js). The course also contains a section on GraphQL, a more modern alternative to REST APIs.
 
