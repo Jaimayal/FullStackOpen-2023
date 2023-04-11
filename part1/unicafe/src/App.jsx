@@ -11,12 +11,16 @@ function Statistics({ good, neutral, bad, all }) {
     return (
       <>
         <h2>Statistics</h2>
-        <StatisticLine statistic={{ name: "good", value: good }} />
-        <StatisticLine statistic={{ name: "neutral", value: neutral }} />
-        <StatisticLine statistic={{ name: "bad", value: bad }} />
-        <StatisticLine statistic={{ name: "all", value: all }} />
-        <StatisticLine statistic={{ name: "average", value: (good - bad) / all }} />
-        <StatisticLine statistic={{ name: "positive", value: good / all }} />
+        <table>
+          <tbody>
+            <StatisticLine statistic={{ name: "good", value: good }} />
+            <StatisticLine statistic={{ name: "neutral", value: neutral }} />
+            <StatisticLine statistic={{ name: "bad", value: bad }} />
+            <StatisticLine statistic={{ name: "all", value: all }} />
+            <StatisticLine statistic={{ name: "average", value: (good - bad) / all }} />
+            <StatisticLine statistic={{ name: "positive", value: ((good / all) * 100) + "%" }} />
+          </tbody>
+        </table>
       </>
     )
   }
@@ -32,7 +36,10 @@ function Statistics({ good, neutral, bad, all }) {
 function StatisticLine({ statistic }) {
   return (
     <>
-      <p>{statistic.name}: {statistic.value}</p>
+      <tr>
+        <td>{statistic.name}</td>
+        <td>{statistic.value}</td>
+      </tr>
     </>
   )
 }
