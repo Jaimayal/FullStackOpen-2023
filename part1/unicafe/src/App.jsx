@@ -11,12 +11,12 @@ function Statistics({ good, neutral, bad, all }) {
     return (
       <>
         <h2>Statistics</h2>
-        <p>good: {good}</p>
-        <p>neutral: {neutral}</p>
-        <p>bad: {bad}</p>
-        <p>all: {all}</p>
-        <p>average: {(good - bad) / all}</p>
-        <p>positive: {good / all} %</p>
+        <StatisticLine statistic={{ name: "good", value: good }} />
+        <StatisticLine statistic={{ name: "neutral", value: neutral }} />
+        <StatisticLine statistic={{ name: "bad", value: bad }} />
+        <StatisticLine statistic={{ name: "all", value: all }} />
+        <StatisticLine statistic={{ name: "average", value: (good - bad) / all }} />
+        <StatisticLine statistic={{ name: "positive", value: good / all }} />
       </>
     )
   }
@@ -25,6 +25,14 @@ function Statistics({ good, neutral, bad, all }) {
     <>
       <h2>Statistics</h2>
       <p>No feedback given</p>
+    </>
+  )
+}
+
+function StatisticLine({ statistic }) {
+  return (
+    <>
+      <p>{statistic.name}: {statistic.value}</p>
     </>
   )
 }
