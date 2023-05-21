@@ -51,11 +51,20 @@ function PersonsList({ persons, searchValue, onDeleteClick }) {
 		));
 }
 
+const Notification = ({ message }) => {
+	if (message === null || message === "") {
+		return null;
+	}
+
+	return <div className="error">{message}</div>;
+};
+
 function App() {
 	const [persons, setPersons] = useState([]);
 	const [newName, setNewName] = useState("");
 	const [newNumber, setNewNumber] = useState("");
 	const [searchValue, setSearchValue] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
 		console.log("Effect");
@@ -85,10 +94,23 @@ function App() {
 		const isDeleteConfirmed = window.confirm(
 			`Are you sure you want to delete this person ?`
 		);
-		if (isDeleteConfirmed) {
-			personsService.deletePersonById(id);
-			setPersons(persons.filter((person) => person.id !== id));
-		}
+		personsService
+			.getById(id)
+			.then(() => {
+				if (isDeleteConfirmed) {
+					personsService.deletePersonById(id);
+					setPersons(persons.filter((person) => person.id !== id));
+				}
+			})
+			.catch((res) => {
+				setErrorMessage(
+					"Information of this person has already been removed from server"
+				);
+				setTimeout(() => {
+					setErrorMessage("");
+				}, 5000);
+				setPersons(persons.filter((person) => person.id !== id));
+			});
 	};
 
 	const onFormSubmit = (event) => {
@@ -103,7 +125,14 @@ function App() {
 				const toUpdate = persons.filter(
 					(person) => person.name === newName
 				)[0];
-				personsService.updatePersonNumber(toUpdate, newNumber);
+				personsService
+					.updatePersonNumber(toUpdate, newNumber)
+					.then(() => {
+						setErrorMessage("Updated a number");
+						setTimeout(() => {
+							setErrorMessage("");
+						}, 5000);
+					});
 				setPersons(
 					persons.map((person) =>
 						person.id === toUpdate.id
@@ -119,11 +148,16 @@ function App() {
 			setPersons(persons.concat(newPerson));
 			setNewName("");
 			setNewNumber("");
+			setErrorMessage("Added a new person");
+			setTimeout(() => {
+				setErrorMessage("");
+			}, 5000);
 		});
 	};
 
 	return (
 		<div>
+			<Notification message={errorMessage} />
 			<h2>Phonebook</h2>
 			<SearchBar
 				onSearchInputChange={onSearchInputChange}
