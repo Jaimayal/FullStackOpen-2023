@@ -2,6 +2,7 @@ const morgan = require("morgan");
 const express = require("express");
 const app = express();
 app.use(express.json());
+app.use(express.static('build'))
 app.use(
 	morgan(function (tokens, req, res) {
 		console.log(req);
@@ -115,6 +116,7 @@ function getNextId() {
 	return Math.round(Math.random() * 10000000);
 }
 
-const PORT = 3001;
-app.listen(PORT);
-console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`)
+  })
