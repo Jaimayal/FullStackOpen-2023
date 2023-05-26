@@ -7,7 +7,6 @@ app.use(express.json());
 app.use(express.static("build"));
 app.use(
 	morgan(function (tokens, req, res) {
-		console.log(req);
 		return [
 			tokens.method(req, res),
 			tokens.url(req, res),
@@ -107,54 +106,20 @@ app.put("/api/persons/:id", (request, response, next) => {
 		.catch((error) => next(error));
 });
 
-// app.post("/api/persons", (request, response) => {
-// 	const entry = request.body;
-// 	if (!entry) {
-// 		return response.status(400).send({
-// 			error: "You must include an entry",
-// 		});
-// 	}
-
-// 	if (!entry.name) {
-// 		return response.status(400).send({
-// 			error: "Name cannot be empty",
-// 		});
-// 	}
-
-// 	if (!entry.number) {
-// 		return response.status(400).send({
-// 			error: "Number cannot be empty",
-// 		});
-// 	}
-
-// 	const nameExists = phonebookEntries.find(
-// 		(phoneEntry) => entry.name === phoneEntry.name
-// 	);
-// 	if (nameExists) {
-// 		return response.status(400).send({
-// 			error: "Name already exists in the phonebook",
-// 		});
-// 	}
-
-// 	const newEntry = {
-// 		id: getNextId(),
-// 		name: entry.name,
-// 		number: entry.number,
-// 	};
-// 	phonebookEntries = phonebookEntries.concat(newEntry);
-// 	response.send(201);
-// });
-
-const errorMiddleware = (error) => {
-	console.error(error);
-
-	if (error === "CastError") {
+const errorMiddleware = (error, request, response, next) => {
+	console.error(error.message)
+	
+	if (error.name === 'CastError') {
+		return response.status(400).send({ error: 'malformatted id' })
+	} 
+	
+	if (error.name === "ValidationError") {
 		return response.status(400).send({
-			error: "Malformatted id",
+			error: error.message,
 		});
 	}
 
-	next(error);
+	next(error)
 };
 
 app.use(errorMiddleware);

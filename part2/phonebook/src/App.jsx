@@ -46,7 +46,9 @@ function PersonsList({ persons, searchValue, onDeleteClick }) {
 				<p key={person.name}>
 					{person.name} | {person.number} | {person.id}
 				</p>
-				<button onClick={() => onDeleteClick(person._id)}>Delete</button>
+				<button onClick={() => onDeleteClick(person._id)}>
+					Delete
+				</button>
 			</>
 		));
 }
@@ -144,15 +146,23 @@ function App() {
 			return;
 		}
 		const newPerson = { name: newName, number: newNumber };
-		personsService.save(newPerson).then(() => {
-			setPersons(persons.concat(newPerson));
-			setNewName("");
-			setNewNumber("");
-			setErrorMessage("Added a new person");
-			setTimeout(() => {
-				setErrorMessage("");
-			}, 5000);
-		});
+		personsService
+			.save(newPerson)
+			.then(() => {
+				setPersons(persons.concat(newPerson));
+				setNewName("");
+				setNewNumber("");
+				setErrorMessage("Added a new person");
+				setTimeout(() => {
+					setErrorMessage("");
+				}, 5000);
+			})
+			.catch((error) => {
+				setErrorMessage(error.response.data.error);
+				setTimeout(() => {
+					setErrorMessage("");
+				}, 5000);
+			});
 	};
 
 	return (
