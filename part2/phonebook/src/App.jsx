@@ -44,9 +44,9 @@ function PersonsList({ persons, searchValue, onDeleteClick }) {
 		.map((person) => (
 			<>
 				<p key={person.name}>
-					{person.name} | {person.number}
+					{person.name} | {person.number} | {person.id}
 				</p>
-				<button onClick={() => onDeleteClick(person.id)}>Delete</button>
+				<button onClick={() => onDeleteClick(person._id)}>Delete</button>
 			</>
 		));
 }
@@ -99,7 +99,7 @@ function App() {
 			.then(() => {
 				if (isDeleteConfirmed) {
 					personsService.deletePersonById(id);
-					setPersons(persons.filter((person) => person.id !== id));
+					setPersons(persons.filter((person) => person._id !== id));
 				}
 			})
 			.catch((res) => {

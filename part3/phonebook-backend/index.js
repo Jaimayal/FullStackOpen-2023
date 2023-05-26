@@ -20,32 +20,39 @@ app.use(
 	})
 );
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
 	Person.find({}).then((entries) => {
 		response.send(entries);
-	});
+	}).catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
 	Person.findById(request.params.id)
 		.then((person) => {
 			console.log(person);
-			response.send(person);
-		})
-		.catch(() => {
+			if (person) {
+				response.send(person);
+			}
+
 			response.status(404).send({
 				error: "Person was not found",
 			});
-		});
+		})
+		.catch((error) => next(error));
 });
 
-app.get("/info", (request, response) => {
-	response.send(`
-    <p>Phonebook has info for ${phonebookEntries.length}</p>
-    <p>${new Date()}</p>`);
+app.get("/info", (request, response, next) => {
+	Person.find({})
+		.then((entries) => {
+			response.send(`
+    				<p>Phonebook has info for ${entries.length}</p>
+    				<p>${new Date()}</p>
+				`);
+		})
+		.catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
 	const entry = request.body;
 	if (!entry) {
 		return response.status(400).send({
@@ -70,24 +77,35 @@ app.post("/api/persons", (request, response) => {
 		number: entry.number,
 	});
 
-	toSave.save().then((result) => {
-		response
-			.status(201)
-			.send("The person was saved successfully");
-	});
+	toSave
+		.save()
+		.then((result) => {
+			response.status(201).send("The person was saved successfully");
+		})
+		.catch((error) => next(error));
 });
 
-// app.delete("/api/persons/:id", (request, response) => {
-// 	const id = Number(request.params.id);
-// 	const newPhonebookEntries = phonebookEntries.filter(
-// 		(entry) => entry.id !== id
-// 	);
-// 	if (newPhonebookEntries.length === phonebookEntries.length) {
-// 		return response.sendStatus(404);
-// 	}
-// 	phonebookEntries = newPhonebookEntries;
-// 	response.sendStatus(204);
-// });
+app.delete("/api/persons/:id", (request, response, next) => {
+	const id = request.params.id;
+	Person.findByIdAndDelete(id)
+		.then((result) => {
+			console.log(result);
+			response.sendStatus(204);
+		})
+		.catch((error) => {
+			next(error);
+		});
+});
+
+app.put("/api/persons/:id", (request, response, next) => {
+	const id = request.params.id;
+
+	Person.findByIdAndUpdate(id, { number: body.number }, { new: true })
+		.then((result) => {
+			response.send(result);
+		})
+		.catch((error) => next(error));
+});
 
 // app.post("/api/persons", (request, response) => {
 // 	const entry = request.body;
@@ -126,6 +144,20 @@ app.post("/api/persons", (request, response) => {
 // 	phonebookEntries = phonebookEntries.concat(newEntry);
 // 	response.send(201);
 // });
+
+const errorMiddleware = (error) => {
+	console.error(error);
+
+	if (error === "CastError") {
+		return response.status(400).send({
+			error: "Malformatted id",
+		});
+	}
+
+	next(error);
+};
+
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
