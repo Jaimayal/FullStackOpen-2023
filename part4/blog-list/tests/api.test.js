@@ -46,9 +46,9 @@ test("Ensure POST saves a new blog", async () => {
 		.get("/api/blogs")
 		.expect(200)
 		.expect("Content-Type", /application\/json/);
-    
+
 	expect(body.length).toBe(helper.initialBlogs.length + 1);
-    const titles = body.map(blog => blog.title)
+	const titles = body.map((blog) => blog.title);
 	expect(titles).toContain("This is a Sample Blog");
 });
 
@@ -66,20 +66,20 @@ test("Ensure POST saves a new blog with zero likes if that propery is missing", 
 		.expect(200)
 		.expect("Content-Type", /application\/json/);
 
-    let likes = -1;
-    for (const savedBlog of body) {
-        if (blog.title === savedBlog.title) {
-            likes = savedBlog.likes;
-            break;
-        }
-    }
-    expect(likes).toBe(0);
+	let likes = -1;
+	for (const savedBlog of body) {
+		if (blog.title === savedBlog.title) {
+			likes = savedBlog.likes;
+			break;
+		}
+	}
+	expect(likes).toBe(0);
 });
 
 test("Ensure POST does not save a new blog if title propery is missing", async () => {
 	const blog = {
 		author: "Jaime Ayala",
-        url: "http://google.com/",
+		url: "http://google.com/",
 	};
 
 	await api.post("/api/blogs").send(blog).expect(400);
@@ -89,7 +89,7 @@ test("Ensure POST does not save a new blog if title propery is missing", async (
 		.expect(200)
 		.expect("Content-Type", /application\/json/);
 
-    expect(body.length).toBe(helper.initialBlogs.length);
+	expect(body.length).toBe(helper.initialBlogs.length);
 });
 
 test("Ensure POST does not save a new blog if url propery is missing", async () => {
@@ -105,7 +105,76 @@ test("Ensure POST does not save a new blog if url propery is missing", async () 
 		.expect(200)
 		.expect("Content-Type", /application\/json/);
 
-    expect(body.length).toBe(helper.initialBlogs.length);
+	expect(body.length).toBe(helper.initialBlogs.length);
+});
+
+test("Ensure DELETE removes a blog", async () => {
+	const blog = {
+		title: "This is a Sample Blog",
+		author: "Jaime Ayala",
+		url: "http://google.com/",
+		likes: 5,
+	};
+
+	await api.post("/api/blogs").send(blog).expect(201);
+
+	const { body: bodyWithNewNote } = await api
+		.get("/api/blogs")
+		.expect(200)
+		.expect("Content-Type", /application\/json/);
+
+	expect(bodyWithNewNote.length).toBe(helper.initialBlogs.length + 1);
+	const savedId = bodyWithNewNote.filter(
+		(savedBlog) => savedBlog.title === blog.title
+	)[0].id;
+
+	await api.delete(`/api/blogs/${savedId}`);
+	const { body: bodyWithNoteDeleted } = await api
+		.get("/api/blogs")
+		.expect(200)
+		.expect("Content-Type", /application\/json/);
+
+	expect(bodyWithNoteDeleted.length).toBe(helper.initialBlogs.length);
+});
+
+test("Ensure PUT updates an existing blog", async () => {
+	const blog = {
+		title: "This is a Sample Blog",
+		author: "Jaime Ayala",
+		url: "http://google.com/",
+		likes: 5,
+	};
+
+	await api.post("/api/blogs").send(blog).expect(201);
+
+	const { body: bodyWithNewNote } = await api
+		.get("/api/blogs")
+		.expect(200)
+		.expect("Content-Type", /application\/json/);
+
+	expect(bodyWithNewNote.length).toBe(helper.initialBlogs.length + 1);
+	const savedId = bodyWithNewNote.filter(
+		(savedBlog) => savedBlog.title === blog.title
+	)[0].id;
+
+	const updatedBlog = {
+		title: "Sample Blog",
+		author: "Jaime",
+		url: "http://google.com.mx/",
+		likes: 22,
+	};
+
+	await api.put(`/api/blogs/${savedId}`).send(updatedBlog).expect(200);
+
+	const { body: bodyWithUpdatedNote } = await api
+		.get("/api/blogs")
+		.expect(200)
+		.expect("Content-Type", /application\/json/);
+
+	expect(bodyWithUpdatedNote.map((savedBlog) => savedBlog.title)).toContain(updatedBlog.title);
+	expect(bodyWithUpdatedNote.map((savedBlog) => savedBlog.likes)).toContain(updatedBlog.likes);
+	expect(bodyWithUpdatedNote.map((savedBlog) => savedBlog.author)).toContain(updatedBlog.author);
+	expect(bodyWithUpdatedNote.map((savedBlog) => savedBlog.url)).toContain(updatedBlog.url);
 });
 
 afterAll(async () => {
