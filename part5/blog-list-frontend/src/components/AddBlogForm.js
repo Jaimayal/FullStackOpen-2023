@@ -1,31 +1,13 @@
 import { useState } from "react";
-import blogService from "../services/blogs";
 
-function AddBlogForm({ setBlogs, setNotification }) {
+function AddBlogForm({ addBlog }) {
 	const [title, setTitle] = useState("");
 	const [author, setAuthor] = useState("");
 	const [url, setUrl] = useState("");
 
 	const onAddBlogFormSubmit = (event) => {
 		event.preventDefault();
-		console.log("Title: ", title);
-		console.log("Author: ", author);
-		console.log("Url: ", url);
-		blogService
-			.saveBlog({ title, author, url })
-			.then((response) => {
-				setBlogs((prevBlogs) => [...prevBlogs, response]);
-				setNotification(`A new blog ${title} by ${author} added`);
-                setTimeout(() => {
-                    setNotification("");
-                }, 5000);
-			})
-			.catch((error) => {
-				setNotification(error.response.data.error);
-                setTimeout(() => {
-                    setNotification("");
-                }, 5000);
-			});
+        addBlog({ title, author, url });
 	};
 
 	return (
