@@ -1,5 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const Blog = require("../models/blog");
+const app = require("../app");
+const supertest = require("supertest")
+const api = supertest(app);
 
 const initialBlogs = [
 	{
@@ -52,6 +55,30 @@ const initialBlogs = [
 	},
 ];
 
+const saveUserAndGetToken = async () => {
+	const user = {
+		username: "Test",
+		password: "Test",
+		name: "Test",
+		blogs: [],
+	};
+
+	await api.post("/api/users").send(user).expect(201);
+
+	const loginRequest = {
+		username: "Test",
+		password: "Test",
+	};
+
+	const tokenResponse = await api
+		.post("/api/auth/login")
+		.send(loginRequest)
+		.expect(200);
+
+	return tokenResponse.body.token;
+}
+
 module.exports = {
 	initialBlogs,
+	saveUserAndGetToken
 };
