@@ -22,6 +22,7 @@ function AddBlogForm({ addBlog }) {
             name="title"
             id="title"
             onChange={({ target }) => setTitle(target.value)}
+            placeholder='Blog Title'
           />
         </div>
         <div>
@@ -31,6 +32,7 @@ function AddBlogForm({ addBlog }) {
             name="author"
             id="author"
             onChange={({ target }) => setAuthor(target.value)}
+            placeholder='Name of Author'
           />
         </div>
         <div>
@@ -40,6 +42,7 @@ function AddBlogForm({ addBlog }) {
             name="url"
             id="url"
             onChange={({ target }) => setUrl(target.value)}
+            placeholder='https://example.com'
           />
         </div>
         <button type="submit">Add</button>
