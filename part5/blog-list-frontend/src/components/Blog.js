@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, updateBlog, deleteBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, loggedInUser }) => {
   const [showDetails, setShowDetails] = useState(false)
 
   const onViewDetailsClick = () => {
@@ -25,8 +25,28 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   }
 
   if (showDetails) {
+    const isLoggedInUserTheOwner = blog.user.username === loggedInUser.username
+    if (isLoggedInUserTheOwner) {
+      return (
+        <div className='blog'>
+          <p>
+            {blog.title} {blog.author}{' '}
+            <button onClick={onViewDetailsClick}>View details</button>
+          </p>
+          <p>{blog.url}</p>
+          <p>
+            likes {blog.likes} <button onClick={onLikeClick}>Like</button>{' '}
+          </p>
+          <p>{blog.user.name}</p>
+          <button onClick={onDeleteClick} style={{ backgroundColor: 'red' }}>
+            Delete
+          </button>
+        </div>
+      )
+    }
+
     return (
-      <div>
+      <div className='blog'>
         <p>
           {blog.title} {blog.author}{' '}
           <button onClick={onViewDetailsClick}>View details</button>
@@ -36,15 +56,12 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
           likes {blog.likes} <button onClick={onLikeClick}>Like</button>{' '}
         </p>
         <p>{blog.user.name}</p>
-        <button onClick={onDeleteClick} style={{ backgroundColor: 'red' }}>
-          Delete
-        </button>
       </div>
     )
   }
 
   return (
-    <div>
+    <div className='blog'>
       {blog.title} {blog.author}
       <button onClick={onViewDetailsClick}>View details</button>
     </div>

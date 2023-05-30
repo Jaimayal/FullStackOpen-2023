@@ -22,5 +22,11 @@ app.use("/api/blogs", middleware.userExtractor, blogsRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/auth", loginRouter)
 
+if (process.env.NODE_ENV === "test") {
+    logger.info("Testing mode");
+    const testingRouter = require("./controllers/tests");
+    app.use("/api/testing", testingRouter);
+}
+
 app.use(middleware.errorHandler);
 module.exports = app

@@ -106,6 +106,7 @@ const App = () => {
             blog={blog}
             updateBlog={updateBlog}
             deleteBlog={deleteBlog}
+            loggedInUser={user}
           />
         ))}
       <Togglable buttonLabel="Add Blog" ref={formRef}>
