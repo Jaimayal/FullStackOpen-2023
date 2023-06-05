@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { addVoteById, addNewAnecdote } from './reducers/anecdoteReducer'
+import { addVoteById, addNewAnecdote, setAnecdotes } from './reducers/anecdoteReducer'
 import {
   removeNotification,
   setNotification,
@@ -9,6 +9,9 @@ import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
 import SearchFilter from './components/SearchFilter'
 import Notification from './components/Notification'
+import anecdotesService from './services/anecdotes'
+import { useEffect } from 'react'
+
 
 const App = () => {
   const anecdotes = useSelector((state) => {
@@ -24,7 +27,13 @@ const App = () => {
 
     return state.anecdotes
   })
+
   const dispatch = useDispatch()
+  useEffect(() => {
+    anecdotesService.getAll().then(({ data }) => {
+      dispatch(setAnecdotes(data))
+    }) 
+  }, [dispatch])
 
   const vote = (id) => {
     dispatch(setNotification('Added a new vote'))
@@ -36,12 +45,17 @@ const App = () => {
 
   const addAnecdote = (event) => {
     event.preventDefault()
-    const anecdote = event.target.anecdote.value
-    dispatch(setNotification('Added a new anecdote'))
-    dispatch(addNewAnecdote(anecdote))
-    setTimeout(() => {
-      dispatch(removeNotification())
-    }, 5000)
+    const anecdote = {
+      content: event.target.anecdote.value,
+      likes: 0
+    }
+    anecdotesService.saveAnecdote(anecdote).then(({ data }) => {
+      dispatch(setNotification('Added a new anecdote'))
+      dispatch(addNewAnecdote(data))
+      setTimeout(() => {
+        dispatch(removeNotification())
+      }, 5000)
+    })
   }
 
   const applyFilter = ({ target }) => {
