@@ -1,6 +1,7 @@
 import Anecdote from './Anecdote'
 
 function AnecdoteList({ anecdotes, vote }) {
+
   return (
     <>
       <h2>Anecdotes</h2>
