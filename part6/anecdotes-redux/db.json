@@ -2,8 +2,18 @@
   "anecdotes": [
     {
       "content": "test1",
-      "votes": 10,
+      "votes": 11,
       "id": 1
+    },
+    {
+      "content": "qwe",
+      "votes": 0,
+      "id": 2
+    },
+    {
+      "content": "q",
+      "votes": 0,
+      "id": 3
     }
   ]
 }

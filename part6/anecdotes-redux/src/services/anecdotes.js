@@ -9,6 +9,9 @@ const getAll = () => {
 }
 
 const saveAnecdote = (anecdote) => {
+  if (anecdote.content.length <= 5) {
+    throw new Error("too short anecdote")
+  }
   return axios.post(baseUrl, anecdote).then((res) => res.data)
 }
 
