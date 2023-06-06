@@ -6,6 +6,7 @@ import anecdotesReducer from './reducers/anecdoteReducer'
 import filterReducer from './reducers/filterReducer'
 import { configureStore } from '@reduxjs/toolkit'
 import notificationReducer from './reducers/notificationReducer'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 const store = configureStore({
   reducer: {
@@ -15,9 +16,13 @@ const store = configureStore({
   },
 })
 
+const queryClient = new QueryClient()
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </Provider>
 )
 
