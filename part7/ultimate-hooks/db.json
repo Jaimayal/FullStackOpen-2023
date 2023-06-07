@@ -1,0 +1,58 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "content": "custom hooks are awesome"
+    },
+    {
+      "id": 2,
+      "content": "best feature ever <3"
+    },
+    {
+      "content": "we",
+      "id": 3
+    },
+    {
+      "content": "we",
+      "id": 4
+    },
+    {
+      "content": "we",
+      "id": 5
+    },
+    {
+      "content": "This is a new note",
+      "id": 6
+    },
+    {
+      "content": "W",
+      "id": 7
+    },
+    {
+      "content": "Tw",
+      "id": 8
+    }
+  ],
+  "persons": [
+    {
+      "id": 1,
+      "name": "Matti Luukkainen",
+      "number": "040-12344565"
+    },
+    {
+      "id": 2,
+      "name": "Tarja Halonen",
+      "number": "040-2223334"
+    },
+    {
+      "name": "qwe",
+      "number": "123",
+      "id": 3
+    },
+    {
+      "name": "NAMNE",
+      "number": "123123",
+      "id": 4
+    }
+  ]
+}
