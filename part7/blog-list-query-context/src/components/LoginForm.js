@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import authService from '../services/login'
 import PropTypes from 'prop-types'
+import AuthContext from '../context/auth'
 
-function LoginForm({ setUser, setNotification }) {
+function LoginForm({ displayNotification }) {
+  const [, userDispatch] = useContext(AuthContext)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -14,19 +16,13 @@ function LoginForm({ setUser, setNotification }) {
       .login({ username, password })
       .then((response) => {
         localStorage.setItem('loggedBloglistUser', JSON.stringify(response))
-        setUser(response)
+        userDispatch({ type: 'SET', payload: response })
         setUsername('')
         setPassword('')
-        setNotification(`Welcome ${response.name}`)
-        setTimeout(() => {
-          setNotification('')
-        }, 5000)
+        displayNotification(`Welcome ${response.name}`)
       })
       .catch((error) => {
-        setNotification(error.response.data.error)
-        setTimeout(() => {
-          setNotification('')
-        }, 5000)
+        displayNotification(error.response.data.error)
       })
   }
 
@@ -60,7 +56,7 @@ function LoginForm({ setUser, setNotification }) {
 
 LoginForm.propTypes = {
   setUser: PropTypes.func.isRequired,
-  setNotification: PropTypes.func.isRequired,
+  displayNotification: PropTypes.func.isRequired,
 }
 
 export default LoginForm
