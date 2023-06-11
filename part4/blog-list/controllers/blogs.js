@@ -55,12 +55,16 @@ blogsRouter.post("", async (request, response, next) => {
 		author,
 		url,
 		likes,
+		comments: [
+			'This is a default comment. Must be displayed in all new blogs'
+		],
 		user: user.id,
 	});
 
 	user.blogs = user.blogs.concat(blog._id);
 	await user.save();
 	const result = await blog.save();
+	console.log(blog);
 	response.status(201).json(result);
 });
 
@@ -94,6 +98,36 @@ blogsRouter.put("/:id", async (request, response) => {
 
 	await Blog.findByIdAndUpdate(id, body);
 	response.sendStatus(200);
+});
+
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+	const user = request.user
+	if (!user) {
+		return response.status(401).json({ error: "Token was not included in your request"})
+	}
+
+	const id = request.params.id;
+	if (!id) {
+		return response.sendStatus(400);
+	}
+
+	const comment = request.body.comment;
+
+	if (!comment || !url) {
+		return response.sendStatus(400);
+	}
+
+	const blog = Blog.findById(id)
+	const updatedBlog = {
+		...blog,
+		comments: [
+			...blog.comments,
+			comment
+		]
+	}
+
+	const result = await Blog.findByIdAndUpdate(id, updatedBlog);
+	response.status(201).json(result);
 });
 
 module.exports = blogsRouter;

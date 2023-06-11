@@ -1,35 +1,16 @@
 import { useState } from 'react'
-import authService from '../services/login'
-import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 
-function LoginForm({ setUser, setNotification, clearNotification }) {
+function LoginForm({ onLogin }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const dispatch = useDispatch()
 
   const onLoginFormSubmit = (event) => {
     event.preventDefault()
     console.log('Username: ', username)
     console.log('Password: ', password)
-    authService
-      .login({ username, password })
-      .then((response) => {
-        localStorage.setItem('loggedBloglistUser', JSON.stringify(response))
-        setUser(response)
-        setUsername('')
-        setPassword('')
-        dispatch(setNotification(`Welcome ${response.name}`))
-        setTimeout(() => {
-          dispatch(clearNotification())
-        }, 5000)
-      })
-      .catch((error) => {
-        dispatch(setNotification(error.response.data.error))
-        setTimeout(() => {
-          dispatch(clearNotification())
-        }, 5000)
-      })
+    onLogin(username, password)
+    setUsername('')
+    setPassword('')
   }
 
   return (
@@ -58,11 +39,6 @@ function LoginForm({ setUser, setNotification, clearNotification }) {
       </form>
     </>
   )
-}
-
-LoginForm.propTypes = {
-  setUser: PropTypes.func.isRequired,
-  setNotification: PropTypes.func.isRequired,
 }
 
 export default LoginForm

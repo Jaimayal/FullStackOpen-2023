@@ -1,124 +1,129 @@
-import { useRef } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
+import { Navigate, Route, Routes, redirect, useMatch } from 'react-router-dom'
+import Users from './components/Users'
+import User from './components/User'
+import { useBlogs, useLogin, useUsers } from './hooks/hooks'
+import BlogList from './components/BlogList'
+import BlogDetails from './components/BlogDetails'
 import LoginForm from './components/LoginForm'
-import AddBlogForm from './components/AddBlogForm'
-import Togglable from './components/Togglable'
+import { useDispatch, useSelector } from 'react-redux'
+import authService from './services/login'
 import {
-  clearNotification,
   setNotification,
+  clearNotification,
 } from './reducers/notificationReducer'
-import {
-  addBlog,
-  removeBlog,
-  updateBlog,
-} from './reducers/blogsReducer'
-import {
-  setUser,
-  clearUser
-} from './reducers/userReducer'
-
-import { useSelector, useDispatch } from 'react-redux'
-import { useBlogs, useLogin } from './hooks/hooks'
-
+import { setUser, clearUser } from './reducers/userReducer'
+import blogsService from './services/blogs'
+import { updateBlog } from './reducers/blogsReducer'
+import Navbar from './components/Navbar'
 const App = () => {
-  const formRef = useRef()
-  const user = useLogin()
+  const users = useUsers()
   const blogs = useBlogs()
-  const notification = useSelector((state) => state.notification)
+  const loggedInUser = useLogin()
   const dispatch = useDispatch()
+  const notification = useSelector((state) => state.notification)
 
-  if (user === null) {
-    return (
-      <>
-        <p>{notification}</p>
-        <LoginForm
-          setUser={setUser}
-          setNotification={setNotification}
-          clearNotification={clearNotification}
-        />
-      </>
-    )
+  const userMatch = useMatch('/users/:id')
+  const user = userMatch
+    ? users.find((usr) => usr.id === userMatch.params.id)
+    : null
+
+  const blogMatch = useMatch('/blogs/:id')
+  const blog = blogMatch
+    ? blogs.find((blg) => blg.id === blogMatch.params.id)
+    : null
+
+  const onLogin = (username, password) => {
+    authService
+      .login({ username, password })
+      .then((response) => {
+        localStorage.setItem('loggedBloglistUser', JSON.stringify(response))
+        dispatch(setUser(response))
+        dispatch(setNotification(`Welcome ${response.name}`))
+        setTimeout(() => {
+          dispatch(clearNotification())
+        }, 5000)
+        redirect('/')
+      })
+      .catch((error) => {
+        dispatch(setNotification(error.response.data.error))
+        setTimeout(() => {
+          dispatch(clearNotification())
+        }, 5000)
+      })
+  }
+
+  const onLikeClick = async (blog) => {
+    const toSendUpdatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user.id,
+    }
+
+    const toDispatchBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+    }
+
+    blogsService
+      .updateBlog(toSendUpdatedBlog)
+      .then(() => dispatch(updateBlog(toDispatchBlog)))
   }
 
   const onLogoutClick = () => {
     localStorage.removeItem('loggedBloglistUser')
     dispatch(clearUser())
-    displayMessageAndHide('User logged out', 5)
-  }
-
-  const displayMessageAndHide = (message, seconds) => {
-    dispatch(setNotification(message))
+    dispatch(setNotification('User logged out'))
     setTimeout(() => {
       dispatch(clearNotification())
-    }, seconds * 1000)
+    }, 5000)
   }
 
-  const add = async (blog) => {
-    try {
-      const saved = await blogService.saveBlog(blog)
-      console.log(saved)
-      dispatch(addBlog(saved))
-      formRef.current.toggleVisibility()
-      displayMessageAndHide(
-        `A new blog ${saved.title} by ${saved.author} added`,
-        5
-      )
-    } catch (error) {
-      console.error(error)
-      displayMessageAndHide(error.response.data.error, 5)
+  const onCommentClick = (blog, comment) => {
+    const toSendBlog = {
+      ...blog,
+      user: blog.user.id,
+      comments: [...blog.comments, comment],
     }
-  }
-
-  const update = async (blog) => {
-    try {
-      const blogToSubmit = {
-        id: blog.id,
-        title: blog.title,
-        author: blog.author,
-        url: blog.url,
-        likes: blog.likes,
-        user: blog.user.id,
-      }
-      await blogService.updateBlog(blogToSubmit)
-      const updated = await blogService.getById(blogToSubmit.id)
-      console.log(updated)
-      dispatch(updateBlog(updated))
-    } catch (error) {
-      displayMessageAndHide(error.response.data.error, 5)
+    const toDispatchBlog = {
+      ...blog,
+      comments: [...blog.comments, comment],
     }
-  }
-
-  const remove = async (blog) => {
-    try {
-      await blogService.deleteBlog(blog.id)
-      dispatch(removeBlog(blog.id))
-    } catch (error) {
-      displayMessageAndHide(error.response.data.error, 5)
-    }
+    blogsService
+      .updateBlog(toSendBlog)
+      .then(() => dispatch(updateBlog(toDispatchBlog)))
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
+    <main>
       <p>{notification}</p>
-      <p>{user.name} logged in</p>
-      <button onClick={onLogoutClick}>logout</button>
-      {[...blogs]
-        .sort((curr, next) => next.likes - curr.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            updateBlog={update}
-            deleteBlog={remove}
-            loggedInUser={user}
-          />
-        ))}
-      <Togglable buttonLabel="Add Blog" ref={formRef}>
-        <AddBlogForm addBlog={add} />
-      </Togglable>
-    </div>
+      <Navbar onLogoutClick={onLogoutClick} user={loggedInUser} />
+      <Routes>
+        <Route path="/" element={<p>pepe</p>} />
+        <Route path="/blogs" element={<BlogList blogs={blogs} />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <BlogDetails
+              blog={blog}
+              updateBlog={onLikeClick}
+              addComment={onCommentClick}
+            />
+          }
+        />
+        <Route path="/users" element={<Users users={users} />} />
+        <Route path="/users/:id" element={<User user={user} />} />
+        <Route
+          path="/login"
+          element={
+            loggedInUser ? (
+              <Navigate to="/blogs" />
+            ) : (
+              <LoginForm onLogin={onLogin} />
+            )
+          }
+        />
+      </Routes>
+    </main>
   )
 }
 
