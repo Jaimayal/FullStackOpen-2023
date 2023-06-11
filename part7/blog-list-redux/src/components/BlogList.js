@@ -11,6 +11,13 @@ import {
 import { addBlog } from '../reducers/blogsReducer'
 import blogService from '../services/blogs'
 import { Link, Navigate } from 'react-router-dom'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Typography from '@mui/material/Typography'
+import BookIcon from '@mui/icons-material/Book'
+import Box from '@mui/material/Box'
 
 function BlogList({ blogs }) {
   const formRef = useRef()
@@ -41,7 +48,7 @@ function BlogList({ blogs }) {
         ...saved,
         user: {
           username,
-          name
+          name,
         },
       }
       console.log(toDispatch)
@@ -58,19 +65,27 @@ function BlogList({ blogs }) {
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
-      {[...blogs]
-        .sort((curr, next) => next.likes - curr.likes)
-        .map((blog) => (
-          <p key={blog.id}>
-            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-          </p>
-        ))}
+    <Box sx={{ maxWidth: 250, marginY: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Blogs
+      </Typography>
+      <List dense={true}>
+        {[...blogs]
+          .sort((curr, next) => next.likes - curr.likes)
+          .map((blog) => (
+            <ListItem key={blog.id}>
+              <ListItemIcon>
+                <BookIcon />
+              </ListItemIcon>
+              <ListItemText primary={<Link to={`/blogs/${blog.id}`}>{blog.title}</Link>} />
+            </ListItem>
+          ))}
+      </List>
+
       <Togglable buttonLabel="Add Blog" ref={formRef}>
         <AddBlogForm addBlog={add} />
       </Togglable>
-    </div>
+    </Box>
   )
 }
 

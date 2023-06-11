@@ -15,6 +15,7 @@ import { setUser, clearUser } from './reducers/userReducer'
 import blogsService from './services/blogs'
 import { updateBlog } from './reducers/blogsReducer'
 import Navbar from './components/Navbar'
+import Notification from './components/Notification'
 const App = () => {
   const users = useUsers()
   const blogs = useBlogs()
@@ -95,10 +96,10 @@ const App = () => {
 
   return (
     <main>
-      <p>{notification}</p>
       <Navbar onLogoutClick={onLogoutClick} user={loggedInUser} />
+      <Notification notification={notification} />
       <Routes>
-        <Route path="/" element={<p>pepe</p>} />
+        <Route path="/" element={<BlogList blogs={blogs} />} />
         <Route path="/blogs" element={<BlogList blogs={blogs} />} />
         <Route
           path="/blogs/:id"
